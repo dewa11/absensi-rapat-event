@@ -543,6 +543,63 @@ class AttendanceController extends BaseController
         $this->app->response()->write($image['content']);
     }
 
+    public function deleteAttendee(string $id, string $attendanceId): void
+    {
+        $eventId = (int) $id;
+        $attendeeId = (int) $attendanceId;
+
+        if ($eventId <= 0 || $attendeeId <= 0) {
+            SessionHelper::flash('error', 'Data tidak valid.');
+            $this->app->redirect('/attendance');
+            return;
+        }
+
+        if (!$this->attendanceModel->eventExists($eventId)) {
+            SessionHelper::flash('error', 'Data kegiatan tidak ditemukan.');
+            $this->app->redirect('/attendance');
+            return;
+        }
+
+        try {
+            $deleted = $this->attendanceModel->deleteAttendeeById($attendeeId, $eventId);
+            if ($deleted) {
+                SessionHelper::flash('success', 'Data peserta berhasil dihapus.');
+            } else {
+                SessionHelper::flash('error', 'Data peserta tidak ditemukan.');
+            }
+        } catch (\Throwable $e) {
+            SessionHelper::flash('error', 'Gagal menghapus data peserta. Silakan coba lagi.');
+        }
+
+        $this->app->redirect('/attendance/detail/' . $eventId);
+    }
+
+    public function deleteEvent(string $id): void
+    {
+        $eventId = (int) $id;
+
+        if ($eventId <= 0) {
+            SessionHelper::flash('error', 'Data tidak valid.');
+            $this->app->redirect('/attendance');
+            return;
+        }
+
+        if (!$this->attendanceModel->eventExists($eventId)) {
+            SessionHelper::flash('error', 'Data kegiatan tidak ditemukan.');
+            $this->app->redirect('/attendance');
+            return;
+        }
+
+        try {
+            $this->attendanceModel->deleteEventById($eventId);
+            SessionHelper::flash('success', 'Data kegiatan dan seluruh absensi berhasil dihapus.');
+        } catch (\Throwable $e) {
+            SessionHelper::flash('error', 'Gagal menghapus data kegiatan. Silakan coba lagi.');
+        }
+
+        $this->app->redirect('/attendance');
+    }
+
     private function isValidDate(string $date): bool
     {
         if ($date === '') {

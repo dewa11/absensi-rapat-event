@@ -284,6 +284,64 @@ class AttendanceModel
         $this->db->runQuery('ALTER TABLE attendances ' . implode(', ', $missingColumns));
     }
 
+    public function deleteAttendeeById(int $attendanceId, int $eventId): bool
+    {
+        $stmt = $this->db->runQuery(
+            'SELECT id, selfie_path FROM attendances WHERE id = ? AND event_id = ? LIMIT 1',
+            [$attendanceId, $eventId]
+        );
+
+        $row = $stmt->fetch();
+        if (!is_array($row)) {
+            return false;
+        }
+
+        $selfiePath = trim((string) ($row['selfie_path'] ?? ''));
+        if ($selfiePath !== '') {
+            $absPath = dirname(__DIR__, 2) . '/' . ltrim($selfiePath, '/');
+            if (is_file($absPath)) {
+                @unlink($absPath);
+            }
+        }
+
+        $this->db->runQuery(
+            'DELETE FROM attendances WHERE id = ? AND event_id = ?',
+            [$attendanceId, $eventId]
+        );
+
+        return true;
+    }
+
+    public function deleteEventById(int $eventId): bool
+    {
+        if (!$this->eventExists($eventId)) {
+            return false;
+        }
+
+        $stmt = $this->db->runQuery(
+            'SELECT selfie_path FROM attendances WHERE event_id = ?',
+            [$eventId]
+        );
+
+        $rows = $stmt->fetchAll();
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
+                $selfiePath = trim((string) ($row['selfie_path'] ?? ''));
+                if ($selfiePath !== '') {
+                    $absPath = dirname(__DIR__, 2) . '/' . ltrim($selfiePath, '/');
+                    if (is_file($absPath)) {
+                        @unlink($absPath);
+                    }
+                }
+            }
+        }
+
+        $this->db->runQuery('DELETE FROM attendances WHERE event_id = ?', [$eventId]);
+        $this->db->runQuery('DELETE FROM events WHERE id = ?', [$eventId]);
+
+        return true;
+    }
+
     private function columnExists(string $tableName, string $columnName): bool
     {
         $stmt = $this->db->runQuery(

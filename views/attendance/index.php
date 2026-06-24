@@ -109,6 +109,9 @@
                                             <?= !empty($row['attendance_token']) ? 'Regenerate Link' : 'Generate Link' ?>
                                         </button>
                                     </form>
+                                    <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $row['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>" method="post" onsubmit="return confirm('Hapus kegiatan &quot;<?= htmlspecialchars((string) $row['title'], ENT_JS, 'UTF-8') ?>&quot; beserta semua data absensinya? Tindakan ini tidak dapat dibatalkan.')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

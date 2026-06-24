@@ -84,6 +84,16 @@ Flight::route('POST /attendance/detail/@id/generate-link', static function ($id)
     $attendanceController()->generateLink((string) $id);
 });
 
+Flight::route('POST /attendance/detail/@id/attendee/@attendee_id/delete', static function ($id, $attendee_id) use ($attendanceController) {
+    AuthMiddleware::handle();
+    $attendanceController()->deleteAttendee((string) $id, (string) $attendee_id);
+});
+
+Flight::route('POST /attendance/detail/@id/delete', static function ($id) use ($attendanceController) {
+    AuthMiddleware::handle();
+    $attendanceController()->deleteEvent((string) $id);
+});
+
 Flight::route('GET /f/@token', static function ($token) use ($attendanceController) {
     $attendanceController()->publicForm((string) $token);
 });

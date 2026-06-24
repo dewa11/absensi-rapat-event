@@ -16,11 +16,16 @@ $publicLink = (string) ($publicLink ?? '');
 <?php else: ?>
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <a href="<?= htmlspecialchars(app_url('/attendance'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-outline-secondary btn-sm">Kembali ke Data Absen</a>
-        <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $event['id'] . '/generate-link'), ENT_QUOTES, 'UTF-8') ?>" method="post">
-            <button type="submit" class="btn btn-sm <?= $publicLink !== '' ? 'btn-outline-warning' : 'btn-outline-success' ?>">
-                <?= $publicLink !== '' ? 'Regenerate Link & QR' : 'Generate Link & QR' ?>
-            </button>
-        </form>
+        <div class="d-flex flex-wrap gap-2">
+            <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $event['id'] . '/generate-link'), ENT_QUOTES, 'UTF-8') ?>" method="post">
+                <button type="submit" class="btn btn-sm <?= $publicLink !== '' ? 'btn-outline-warning' : 'btn-outline-success' ?>">
+                    <?= $publicLink !== '' ? 'Regenerate Link & QR' : 'Generate Link & QR' ?>
+                </button>
+            </form>
+            <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $event['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>" method="post" onsubmit="return confirm('Hapus kegiatan ini beserta semua data absensinya? Tindakan ini tidak dapat dibatalkan.')">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus Kegiatan</button>
+            </form>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm mb-3">
@@ -90,12 +95,13 @@ $publicLink = (string) ($publicLink ?? '');
                         <th>Selfie</th>
                         <th>Waktu Hadir</th>
                         <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                     </thead>
                     <tbody>
                     <?php if (empty($attendees)): ?>
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">Belum ada peserta yang mengisi form.</td>
+                            <td colspan="8" class="text-center text-muted py-4">Belum ada peserta yang mengisi form.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $attendee): ?>
@@ -124,6 +130,11 @@ $publicLink = (string) ($publicLink ?? '');
                                     <?php else: ?>
                                         <span class="badge text-bg-success">Tepat Waktu</span>
                                     <?php endif; ?>
+                                </td>
+                                <td>
+                                    <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $event['id'] . '/attendee/' . (int) $attendee['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>" method="post" onsubmit="return confirm('Hapus data absensi <?= htmlspecialchars((string) $attendee['participant_name'], ENT_JS, 'UTF-8') ?>? Tindakan ini tidak dapat dibatalkan.')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

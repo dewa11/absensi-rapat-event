@@ -132,7 +132,7 @@ $publicLink = (string) ($publicLink ?? '');
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $event['id'] . '/attendee/' . (int) $attendee['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>" method="post" onsubmit="return confirm('Hapus data absensi <?= htmlspecialchars((string) $attendee['participant_name'], ENT_JS, 'UTF-8') ?>? Tindakan ini tidak dapat dibatalkan.')">
+                                    <form action="<?= htmlspecialchars(app_url('/attendance/detail/' . (int) $event['id'] . '/attendee/' . (int) $attendee['id'] . '/delete'), ENT_QUOTES, 'UTF-8') ?>" method="post" onsubmit="return confirm('Hapus data absensi ini? Tindakan ini tidak dapat dibatalkan.')">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
                                     </form>
                                 </td>
